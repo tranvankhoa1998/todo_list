@@ -1,0 +1,49 @@
+name: CI/CD Pipeline
+on:
+  push:
+    branches:
+      - dev
+      - staging
+  pull_request:
+    branches:
+      - staging
+      - main
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Git
+        run: sudo apt update && sudo apt install -y git
+      - name: Checkout repo
+        uses: actions/checkout@v3
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - name: Install dependencies
+        run: npm install
+      - name: Run tests
+        run: npm test
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+      - name: Build Docker image
+        run: docker build -t my-todo-app .
+      - name: Deploy to staging
+        if: github.ref == 'refs/heads/staging'
+        run: echo "Deploying to staging..."
+      - name: Deploy to production
+        if: github.ref == 'refs/heads/main' && github.event_name == 'pull_request'
+        run: echo "Deploying to production..."
+      - name: Set permissions
+        run: |
+          if [[ "${{ github.event.pull_request.base.ref }}" == "main" || "${{ github.event.pull_request.base.ref }}" == "staging" ]]; then
+            ALLOWED_USERS=("devops-user" "admin-user")
+            if [[ ! " ${ALLOWED_USERS[@]} " =~ " ${{ github.actor }} " ]]; then
+              echo "❌ User ${{ github.actor }} is not allowed to merge to this branch."
+              exit 1
+            fi
+          fi
