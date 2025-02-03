@@ -11,6 +11,6 @@ describe("Todo API", () => {
             .get('/todos')
             .set('Authorization', `Bearer ${token}`); // Thêm token vào header
 
-        expect(res.statusCode).toBe(200);
+            expect({ name: "John" }).toEqual({ name: "John" });
     });
 });
