@@ -1,6 +1,7 @@
 const request = require('supertest');
 const app = require('../app');
 const jwt = require('jsonwebtoken');
+const { pool } = require('../db'); // Import kết nối database
 
 const SECRET_KEY = process.env.SECRET_KEY || 'mysecret';
 const token = jwt.sign({ id: 1, role: "admin" }, SECRET_KEY, { expiresIn: "1h" });
