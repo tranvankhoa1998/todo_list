@@ -12,8 +12,6 @@ jobs:
   test:
     runs-on: ubuntu-latest
     strategy: 
-      matrix:
-         node-version: [18.x]
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
