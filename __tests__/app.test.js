@@ -10,12 +10,12 @@ describe("Todo API", () => {
     it("should return 200 for GET /todos", async () => {
         const res = await request(app)
             .get('/todos')
-            .set('Authorization', `Bearer ${token}`); // Thêm token vào header
+            .set('Authorization', `Bearer ${token}`);
 
-            expect({ name: "John" }).toEqual({ name: "John" });
-        });
-
-        afterAll(async () => {
-            await pool.end(); // Đóng kết nối database sau khi test xong
-        });
+        expect(res.statusCode).toBe(200);
     });
+
+    afterAll(async () => {
+        await pool.end(); // Đóng kết nối database sau khi test xong
+    });
+});
