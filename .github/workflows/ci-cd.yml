@@ -51,7 +51,7 @@ jobs:
       - name: Set permissions
         run: |
           if [[ "${{ github.event.pull_request.base.ref }}" == "main" || "${{ github.event.pull_request.base.ref }}" == "staging" ]]; then
-            ALLOWED_USERS=("devops-user" "admin-user")
+            ALLOWED_USERS=("devops-user" "tranvankhoa1998")
             if [[ ! " ${ALLOWED_USERS[@]} " =~ " ${{ github.actor }} " ]]; then
               echo "❌ User ${{ github.actor }} is not allowed to merge to this branch."
               exit 1
