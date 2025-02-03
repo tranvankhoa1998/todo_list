@@ -12,5 +12,9 @@ describe("Todo API", () => {
             .set('Authorization', `Bearer ${token}`); // Thêm token vào header
 
             expect({ name: "John" }).toEqual({ name: "John" });
+        });
+
+        afterAll(async () => {
+            await pool.end(); // Đóng kết nối database sau khi test xong
+        });
     });
-});
