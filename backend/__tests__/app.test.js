@@ -1,5 +1,5 @@
 const request = require('supertest');
-const app = require('./backend');
+const app = require('./app');
 const jwt = require('jsonwebtoken');
 
 const SECRET_KEY = process.env.SECRET_KEY || 'mysecret';
