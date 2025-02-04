@@ -10,7 +10,9 @@ on:
       - main
 jobs:
   vankhoa_vmware_virtualplatform_for_self-hosted:
-    runs-on: self-hosted
+    runs-on: 
+      - self-hosted
+      - label-1
   test:
     runs-on: ubuntu-latest
     steps:
