@@ -9,6 +9,8 @@ on:
       - staging
       - main
 jobs:
+  vankhoa_vmware_virtualplatform_for_self-hosted:
+    runs-on: self-hosted
   test:
     runs-on: ubuntu-latest
     strategy: 
