@@ -1,7 +1,6 @@
 name: CI/CD Pipeline
 on:
   push:
-    paths: .github/workflows/ci-cd.yml
     branches:
       - dev
       - staging
