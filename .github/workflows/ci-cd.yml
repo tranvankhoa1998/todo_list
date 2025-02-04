@@ -10,6 +10,8 @@ on:
       - staging
       - main
 jobs:
+  self-hosted:
+    runs-on: self-hosted
   test:
     runs-on: 
       - ubuntu-latest
