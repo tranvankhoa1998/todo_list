@@ -9,7 +9,7 @@ on:
       - staging
       - main
 jobs:
-  self-hosted:
+  test:
     runs-on: self-hosted
     steps:
       - name: Checkout code
