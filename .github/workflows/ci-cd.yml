@@ -9,12 +9,11 @@ on:
       - staging
       - main
 jobs:
-  vankhoa_vmware_virtualplatform_for_self-hosted:
+  test:
     runs-on: 
       - self-hosted
-      - label-1
-  test:
-    runs-on: ubuntu-latest
+      - label-1.label-2
+      - ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
