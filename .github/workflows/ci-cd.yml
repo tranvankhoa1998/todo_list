@@ -37,11 +37,6 @@ jobs:
   deploy:
     needs: test
     runs-on: ubuntu-latest
-    services:
-      my-todo-app:
-        image: my-todo-app
-        ports:
-          - 3000:3000
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
