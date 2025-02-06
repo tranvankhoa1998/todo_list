@@ -10,7 +10,7 @@ on:
       - main
 jobs:
   test:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -42,6 +42,8 @@ jobs:
         uses: actions/checkout@v3
       - name: Build Docker image
         run: docker build -t my-todo-app ./backend
+      - name: Run Docker container
+        run: docker run -d -p 3000:3000 --name my-todo-container my-todo-app
       - name: Deploy to staging
         if: github.ref == 'refs/heads/staging'
         run: echo "Deploying to staging..."
