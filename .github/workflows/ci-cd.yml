@@ -43,9 +43,11 @@ jobs:
       - name: Login to Docker Hub
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
       - name: Build Docker image with cache
-        run: docker build --cache-from=type=registry,ref=${{ secrets.DOCKER_USERNAME }}/my-todo-app:latest -t my-todo-app ./backend
+        run: docker build --cache-from=type=registry,ref=${{ secrets.DOCKER_USERNAME }}/my-todo-app:tagname -t my-todo-app ./backend
+      - name: Push Docker image to Docker Hub
+        run: docker push ${{ secrets.DOCKER_USERNAME }}/my-todo-app:tagname
       - name: Run Docker container
-        run: docker run -d -p 3000:3000 --name my-todo-container my-todo-app
+        run: docker run -d -p 3000:3000 --name my-todo-container ${{ secrets.DOCKER_USERNAME }}/my-todo-app:tagname
       - name: Deploy to staging
         if: github.ref == 'refs/heads/staging'
         run: echo "Deploying to staging..."
