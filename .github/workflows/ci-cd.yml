@@ -43,12 +43,14 @@ jobs:
       - name: Login to Docker Hub
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
       - name: Build Docker Image
-        run: docker build -t vankhoa211/my-todo-app:tagname ./backend
+        run: |
+            docker images | grep vankhoa211/my-todo-app || docker build -t vankhoa211/my-todo-app:tagname ./backend
+            docker build --cache-from vankhoa211/my-todo-app:tagname -t vankhoa211/my-todo-app:tagname ./backend
       - name: Pull & Run Container
         run: |
             docker push vankhoa211/my-todo-app:tagname
             docker pull vankhoa211/my-todo-app:tagname
-            docker run -d -p 3000:3000 --name my-todo-container vankhoa211/my-todo-app:tagname
+            docker run --rm -d -p 3000:3000 --name my-todo-container vankhoa211/my-todo-app:tagname
             docker ps
       - name: Deploy to staging
         if: github.ref == 'refs/heads/staging'
