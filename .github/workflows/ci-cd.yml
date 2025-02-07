@@ -50,14 +50,16 @@ jobs:
         run: |
             docker push vankhoa211/my-todo-app:tagname
             docker pull vankhoa211/my-todo-app:tagname
-            docker run --rm -d -p 3000:3000 --name my-todo-container vankhoa211/my-todo-app:tagname
             docker ps
       - name: Deploy to staging
         if: github.ref == 'refs/heads/staging'
-        run: echo "Deploying to staging..."
+        run: | 
+             echo "Deploying to staging..."
       - name: Deploy to production
         if: github.ref == 'refs/heads/main' && github.event_name == 'pull_request'
-        run: echo "Deploying to production..."
+        run: | 
+             echo "Deploying to production..."
+             docker run --rm -d -p 3000:3000 --name my-todo-container vankhoa211/my-todo-app:tagname
       - name: Set permissions
         run: |
           if [[ "${{ github.event.pull_request.base.ref }}" == "main" || "${{ github.event.pull_request.base.ref }}" == "staging" ]]; then
