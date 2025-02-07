@@ -10,7 +10,7 @@ on:
       - main
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -36,14 +36,20 @@ jobs:
           npm test
   deploy:
     needs: test
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
-      - name: Build Docker image
-        run: docker build -t my-todo-app ./backend
-      - name: Run Docker container
-        run: docker run -d -p 3000:3000 --name my-todo-container my-todo-app
+      - name: Login to Docker Hub
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+      - name: Build Docker Image
+        run: docker build -t vankhoa211/my-todo-app:tagname ./backend
+      - name: Pull & Run Container
+        run: |
+            docker push vankhoa211/my-todo-app:tagname
+            docker pull vankhoa211/my-todo-app:tagname
+            docker run -d -p 3000:3000 --name my-todo-container vankhoa211/my-todo-app:tagname
+            docker ps
       - name: Deploy to staging
         if: github.ref == 'refs/heads/staging'
         run: echo "Deploying to staging..."
