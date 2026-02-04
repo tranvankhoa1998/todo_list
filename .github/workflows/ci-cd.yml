@@ -1,71 +1,131 @@
 name: CI/CD Pipeline
+
 on:
   push:
     branches:
       - dev
       - staging
+      - main
   pull_request:
     branches:
+      - dev
+      - frontend-code
+      - backend-code
       - staging
       - main
+
+permissions:
+  contents: read
+
 jobs:
-  test:
-    runs-on: self-hosted
+  build_check:
+    if: github.event_name == 'pull_request' && github.base_ref == 'dev'
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 18
-          cache: 'npm'
-          cache-dependency-path: backend/package-lock.json  # 🔥 Chỉ định file lock
+          cache: npm
+          cache-dependency-path: |
+            backend/package-lock.json
+            frontend/package-lock.json
 
-      - name: Install dependencies
+      - name: Install backend dependencies
         run: |
-          cd backend  # 🔥 Di chuyển vào thư mục backend
+          cd backend
           npm ci
-      - name: Build
+      - name: Build backend
         run: |
-          cd backend 
+          cd backend
           npm run build --if-present
-      - name: Run tests
+      - name: Install frontend dependencies
         run: |
-          cd backend 
-          npm test
-  deploy:
-    needs: test
-    runs-on: self-hosted
+          cd frontend
+          npm ci
+      - name: Build frontend
+        run: |
+          cd frontend
+          npm run build
+
+  frontend_pr_check:
+    if: github.event_name == 'pull_request' && github.base_ref == 'frontend-code'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        run: |
+          cd frontend
+          npm ci
+      - name: Lint frontend
+        run: |
+          cd frontend
+          npm run lint --if-present
+      - name: Build frontend
+        run: |
+          cd frontend
+          npm run build
+
+  build_and_push:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
       - name: Login to Docker Hub
-        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
-      - name: Build Docker Image
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: vankhoa211/my-todo-app
+          tags: |
+            type=sha
+            type=ref,event=branch
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+  deploy:
+    needs: build_and_push
+    runs-on: self-hosted
+    if: github.ref == 'refs/heads/staging' || github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Deploy with Docker Compose
+        env:
+          TAG: ${{ github.sha }}
         run: |
-            docker images | grep vankhoa211/my-todo-app || docker build -t vankhoa211/my-todo-app:tagname ./backend
-            docker build --cache-from vankhoa211/my-todo-app:tagname -t vankhoa211/my-todo-app:tagname ./backend
-      - name: Pull & Run Container
-        run: |
-            docker push vankhoa211/my-todo-app:tagname
-            docker pull vankhoa211/my-todo-app:tagname
-            docker ps
-      - name: Deploy to staging
-        if: github.ref == 'refs/heads/staging'
-        run: | 
-             echo "Deploying to staging..."
-      - name: Deploy to production
-        if: github.ref == 'refs/heads/main' && github.event_name == 'pull_request'
-        run: | 
-             echo "Deploying to production..."
-             docker run --rm -d -p 3000:3000 --name my-todo-container vankhoa211/my-todo-app:tagname
-      - name: Set permissions
-        run: |
-          if [[ "${{ github.event.pull_request.base.ref }}" == "main" || "${{ github.event.pull_request.base.ref }}" == "staging" ]]; then
-            ALLOWED_USERS=("devops-user" "tranvankhoa1998")
-            if [[ ! " ${ALLOWED_USERS[@]} " =~ " ${{ github.actor }} " ]]; then
-              echo "❌ User ${{ github.actor }} is not allowed to merge to this branch."
-              exit 1
-            fi
-          fi
+          docker compose -f docker-compose.yml pull
+          docker compose -f docker-compose.yml up -d
