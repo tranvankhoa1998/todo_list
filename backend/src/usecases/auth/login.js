@@ -1,13 +1,32 @@
-const loginUser = async ({ userRepo, jwt, secret, username, password }) => {
-  const user = await userRepo.findByUsernameAndPassword(username, password);
+const bcrypt = require('bcryptjs');
+const { createAccessToken, createRefreshToken, getRefreshExpiry } = require('./tokenService');
+
+const loginUser = async ({ userRepo, refreshTokenRepo, jwt, secret, username, password }) => {
+  const user = await userRepo.findByUsername(username);
   if (!user) {
     const error = new Error('Invalid credentials');
     error.statusCode = 401;
     throw error;
   }
 
-  const token = jwt.sign({ id: user.id, role: user.role }, secret, { expiresIn: '1h' });
-  return { token };
+  const valid = await bcrypt.compare(password, user.password_hash);
+  if (!valid) {
+    const error = new Error('Invalid credentials');
+    error.statusCode = 401;
+    throw error;
+  }
+
+  const accessToken = createAccessToken(jwt, secret, user);
+  const refreshToken = createRefreshToken();
+  const refreshExpiresAt = getRefreshExpiry();
+
+  await refreshTokenRepo.createRefreshToken({
+    userId: user.id,
+    token: refreshToken,
+    expiresAt: refreshExpiresAt,
+  });
+
+  return { accessToken, refreshToken };
 };
 
 module.exports = { loginUser };
