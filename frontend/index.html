@@ -8,13 +8,19 @@
   <body>
     <div id="app" class="app">
       <header class="app__header">
-        <h1>Todo App</h1>
-        <p>Single-page app, focused on logic.</p>
+        <div>
+          <p class="eyebrow">Workspace</p>
+          <h1>Task Console</h1>
+          <p class="sub">Single-page app, focused on logic.</p>
+        </div>
+        <div class="header__actions">
+          <button id="logout-btn" class="ghost">Logout</button>
+        </div>
       </header>
 
       <section class="card" id="auth-card">
         <h2>Login</h2>
-        <form id="login-form">
+        <form id="login-form" class="grid">
           <label>
             Username
             <input type="text" id="username" autocomplete="username" required />
@@ -30,10 +36,58 @@
         </div>
       </section>
 
+      <section class="card" id="home-card">
+        <div class="toolbar">
+          <div class="pill">Tasks</div>
+          <div class="row">
+            <button class="ghost">Import</button>
+            <button>New Task</button>
+          </div>
+        </div>
+
+        <div class="table">
+          <div class="table__row table__head">
+            <div class="cell">Task Number</div>
+            <div class="cell">Task Name</div>
+            <div class="cell">Task Description</div>
+            <div class="cell">Priority</div>
+            <div class="cell">Assigned</div>
+            <div class="cell">Status</div>
+            <div class="cell">Start Date</div>
+            <div class="cell">End Date</div>
+            <div class="cell">Expected Time</div>
+            <div class="cell">Phase</div>
+          </div>
+          <div class="table__row table__filters">
+            <div class="cell"><select><option>All</option></select></div>
+            <div class="cell"><input placeholder="Search" /></div>
+            <div class="cell"><input placeholder="Contains" /></div>
+            <div class="cell"><select><option>Any</option></select></div>
+            <div class="cell"><select><option>Anyone</option></select></div>
+            <div class="cell"><select><option>Any</option></select></div>
+            <div class="cell"><input type="date" /></div>
+            <div class="cell"><input type="date" /></div>
+            <div class="cell"><select><option>Any</option></select></div>
+            <div class="cell"><select><option>Any</option></select></div>
+          </div>
+          <div class="table__row">
+            <div class="cell">#001</div>
+            <div class="cell">Onboarding</div>
+            <div class="cell">Setup environment</div>
+            <div class="cell">High</div>
+            <div class="cell">Khoa</div>
+            <div class="cell">Doing</div>
+            <div class="cell">2026-02-04</div>
+            <div class="cell">2026-02-10</div>
+            <div class="cell">12h</div>
+            <div class="cell">Phase 1</div>
+          </div>
+        </div>
+      </section>
+
       <section class="card" id="todos-card">
         <div class="row">
           <h2>Todos</h2>
-          <button id="logout-btn" class="ghost">Logout</button>
         </div>
 
         <form id="todo-form" class="row">
