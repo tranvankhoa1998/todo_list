@@ -6,13 +6,15 @@ const { Pool } = require('pg'); // Đổi sang 'mysql' nếu dùng MySQL
 const app = express();
 app.use(bodyParser.json());
 
-const pool = new Pool({
-  user: process.env.DB_USER || 'postgres',
-  host: process.env.DB_HOST || 'db',
-  database: process.env.DB_NAME || 'todo',
-  password: process.env.DB_PASS || 'password',
-  port: process.env.DB_PORT || 5432,
-});
+const pool = process.env.DATABASE_URL
+  ? new Pool({ connectionString: process.env.DATABASE_URL })
+  : new Pool({
+      user: process.env.DB_USER || 'postgres',
+      host: process.env.DB_HOST || 'db',
+      database: process.env.DB_NAME || 'todo',
+      password: process.env.DB_PASS || 'password',
+      port: process.env.DB_PORT || 5432,
+    });
 
 const SECRET_KEY = process.env.SECRET_KEY || 'mysecret';
 
@@ -50,6 +52,7 @@ app.post('/todos', authenticateToken, async (req, res) => {
   res.status(201).send('Todo added');
 });
 
-app.listen(3000, () => console.log('Server running on port 3000'));
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
 module.exports = app;
