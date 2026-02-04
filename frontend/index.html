@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Todo SPA</title>
+  </head>
+  <body>
+    <div id="app" class="app">
+      <header class="app__header">
+        <h1>Todo App</h1>
+        <p>Single-page app, focused on logic.</p>
+      </header>
+
+      <section class="card" id="auth-card">
+        <h2>Login</h2>
+        <form id="login-form">
+          <label>
+            Username
+            <input type="text" id="username" autocomplete="username" required />
+          </label>
+          <label>
+            Password
+            <input type="password" id="password" autocomplete="current-password" required />
+          </label>
+          <button type="submit">Login</button>
+        </form>
+        <div class="hint">
+          Token will be stored locally to call protected endpoints.
+        </div>
+      </section>
+
+      <section class="card" id="todos-card">
+        <div class="row">
+          <h2>Todos</h2>
+          <button id="logout-btn" class="ghost">Logout</button>
+        </div>
+
+        <form id="todo-form" class="row">
+          <input type="text" id="todo-title" placeholder="Add a new todo" required />
+          <button type="submit">Add</button>
+        </form>
+
+        <ul id="todo-list" class="list"></ul>
+      </section>
+
+      <section class="card" id="log-card">
+        <h2>System Log</h2>
+        <pre id="log"></pre>
+      </section>
+    </div>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
