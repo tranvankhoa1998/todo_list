@@ -9,11 +9,17 @@ services:
       POSTGRES_DB: ${DB_NAME:-todo}
     volumes:
       - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   backend:
-    build: .
+    image: vankhoa211/my-todo-app:${TAG:-latest}
+    build:
+      context: ./backend
     environment:
-      DATABASE_URL: ${DATABASE_URL:-}
       DB_USER: ${DB_USER:-postgres}
       DB_PASS: ${DB_PASS:-password}
       DB_NAME: ${DB_NAME:-todo}
@@ -21,10 +27,20 @@ services:
       DB_PORT: 5432
       SECRET_KEY: ${SECRET_KEY:-mysecret}
       NODE_ENV: production
+    depends_on:
+      db:
+        condition: service_healthy
     expose:
       - "3000"
+
+  nginx:
+    build:
+      context: .
+      dockerfile: nginx/Dockerfile
+    ports:
+      - "80:80"
     depends_on:
-      - db
+      - backend
 
 volumes:
   db_data:
