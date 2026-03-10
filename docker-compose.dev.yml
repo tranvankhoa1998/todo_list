@@ -35,10 +35,10 @@ services:
 
   frontend:
     image: node:18-alpine
-    working_dir: /app
+    working_dir: /frontend
     volumes:
-      - ./frontend:/app
-      - /app/node_modules
+      - ./frontend:/frontend
+      - /frontend/node_modules
     environment:
       NODE_ENV: development
       VITE_PROXY_TARGET: http://backend:3000

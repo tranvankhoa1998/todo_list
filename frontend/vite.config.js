@@ -1,16 +1,21 @@
-import { defineConfig } from 'vite';
+import { defineConfig, loadEnv } from 'vite';
 
-const proxyTarget = process.env.VITE_PROXY_TARGET || 'http://localhost:3000';
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd(), '');
+  const proxyTarget = (env.VITE_PROXY_TARGET || 'http://localhost:3000').trim();
+  const port = Number(env.VITE_PORT) || 3001;
+  const host = (env.VITE_HOST || '').trim() || true;
 
-export default defineConfig({
-  server: {
-    host: true,
-    port: 3001,
-    proxy: {
-      '/api': proxyTarget,
+  return {
+    server: {
+      host,
+      port,
+      proxy: {
+        '/api': proxyTarget,
+      },
     },
-  },
-  build: {
-    outDir: 'dist',
-  },
+    build: {
+      outDir: 'dist',
+    },
+  };
 });
