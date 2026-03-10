@@ -4,7 +4,7 @@ npm-debug.log
 
 # Env
 .env
-
+node_modules
 # Frontend build
 frontend/dist
 frontend/node_modules

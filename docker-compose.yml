@@ -16,7 +16,7 @@ services:
       retries: 5
 
   backend:
-    image: vankhoa211/my-todo-app:${TAG:-latest}
+    image: vankhoa211/my-todo-app:${TAG:-staging}
     build:
       context: ./backend
     environment:
